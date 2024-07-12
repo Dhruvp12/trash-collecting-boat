@@ -1,0 +1,89 @@
+#include <SoftwareSerial.h>
+
+// Motor pins
+const int motorALeft = 3;
+const int motorARight = 4;
+const int motorBLeft = 5;
+const int motorBRight = 6;
+
+// IR sensor pin
+const int irSensorPin = A0;
+
+// Bluetooth module pins
+const int btRxPin = 8;
+const int btTxPin = 7;
+
+void setup() {
+  // Set motor pins as outputs
+  pinMode(motorALeft, OUTPUT);
+  pinMode(motorARight, OUTPUT);
+  pinMode(motorBLeft, OUTPUT);
+  pinMode(motorBRight, OUTPUT);
+  
+  // Set IR sensor pin as input
+  pinMode(irSensorPin, INPUT);
+  
+  // Initialize serial communication for Bluetooth
+  Serial.begin(9600);
+}
+
+void loop() {
+  // Read the value from the IR sensor
+  int irValue = analogRead(irSensorPin);
+  
+  // If IR sensor detects trash (value less than a threshold, e.g., 500)
+  if (irValue < 500) {
+    stopMotors();
+  }
+
+  // Check for Bluetooth commands
+  if (Serial.available()) {
+    char command = Serial.read();
+    if (command == 'F') {
+      moveForward();
+    } else if (command == 'B') {
+      moveBackward();
+    } else if (command == 'S') {
+      stopMotors();
+    } else if (command == 'L') {
+      turnLeft();
+    } else if (command == 'R') {
+      turnRight();
+    }
+  }
+}
+
+void moveForward() {
+  digitalWrite(motorALeft, HIGH);
+  digitalWrite(motorARight, LOW);
+  digitalWrite(motorBLeft, HIGH);
+  digitalWrite(motorBRight, LOW);
+}
+
+void moveBackward() {
+  digitalWrite(motorALeft, LOW);
+  digitalWrite(motorARight, HIGH);
+  digitalWrite(motorBLeft, LOW);
+  digitalWrite(motorBRight, HIGH);
+}
+
+void stopMotors() {
+  digitalWrite(motorALeft, LOW);
+  digitalWrite(motorARight, LOW);
+  digitalWrite(motorBLeft, LOW);
+  digitalWrite(motorBRight, LOW);
+}
+
+void turnLeft() {
+  digitalWrite(motorALeft, LOW); // Left motor backward
+  digitalWrite(motorARight, HIGH);
+  digitalWrite(motorBLeft, HIGH); // Right motor forward
+  digitalWrite(motorBRight, LOW);
+}
+
+void turnRight() {
+  digitalWrite(motorALeft, HIGH); // Left motor forward
+  digitalWrite(motorARight, LOW);
+  digitalWrite(motorBLeft, LOW);  // Right motor backward
+  digitalWrite(motorBRight, HIGH);
+}
