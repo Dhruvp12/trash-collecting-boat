@@ -10,8 +10,7 @@ const int motorBRight = 6;
 const int irSensorPin = A0;
 
 // Bluetooth module pins
-const int btRxPin = 8;
-const int btTxPin = 7;
+SoftwareSerial BTSerial(10, 11); // RX | TX
 
 void setup() {
   // Set motor pins as outputs
@@ -25,6 +24,7 @@ void setup() {
   
   // Initialize serial communication for Bluetooth
   Serial.begin(9600);
+  BTSerial.begin(9600); // Ensure this matches the baud rate of your Bluetooth module
 }
 
 void loop() {
@@ -37,8 +37,8 @@ void loop() {
   }
 
   // Check for Bluetooth commands
-  if (Serial.available()) {
-    char command = Serial.read();
+  if (BTSerial.available()) {
+    char command = BTSerial.read();
     if (command == 'F') {
       moveForward();
     } else if (command == 'B') {
@@ -85,5 +85,5 @@ void turnRight() {
   digitalWrite(motorALeft, HIGH); // Left motor forward
   digitalWrite(motorARight, LOW);
   digitalWrite(motorBLeft, LOW);  // Right motor backward
-  digitalWrite(motorBRight, HIGH);
+  digitalWrite(motorBRight, HIGH);
 }
